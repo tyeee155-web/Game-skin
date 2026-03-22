@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>🐍 Pink Snake</title>
+
+<style>
+  body {
+    background: #ffd6e7;
+    text-align: center;
+    font-family: sans-serif;
+  }
+
+  h1 {
+    color: #ff4d88;
+  }
+
+  #score {
+    font-size: 20px;
+    color: #ff4d88;
+  }
+
+  canvas {
+    background: #fff;
+    border: 3px solid #ff4d88;
+    margin-top: 20px;
+  }
+
+  .controls {
+    margin-top: 20px;
+  }
+
+  button {
+    padding: 10px 20px;
+    margin: 5px;
+    font-size: 18px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    background: #ff4d88;
+    color: white;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>🐍 เกมงูน่ารัก 💖</h1>
+<div id="score">คะแนน: 0</div>
+
+<canvas id="game" width="300" height="300"></canvas>
+
+<div class="controls">
+  <br>
+  <button onclick="setDirection('up')">⬆️</button><br>
+  <button onclick="setDirection('left')">⬅️</button>
+  <button onclick="setDirection('down')">⬇️</button>
+  <button onclick="setDirection('right')">➡️</button>
+</div>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+let snake = [{x:150, y:150}];
+let direction = "right";
+let apple = {x: 100, y: 100};
+let size = 10;
+let score = 0;
+
+function setDirection(dir) {
+  direction = dir;
+}
+
+function spawnApple() {
+  let newX, newY;
+  let valid = false;
+
+  while(!valid) {
+    newX = Math.floor(Math.random()*30)*10;
+    newY = Math.floor(Math.random()*30)*10;
+
+    valid = true;
+
+    for(let part of snake) {
+      if(part.x === newX && part.y === newY) {
+        valid = false;
+        break;
+      }
+    }
+  }
+
+  apple.x = newX;
+  apple.y = newY;
+}
+
+function draw() {
+  ctx.clearRect(0,0,300,300);
+
+  // 🐍 งูสีชมพู
+  ctx.fillStyle = "#ff4d88";
+  snake.forEach(part => {
+    ctx.fillRect(part.x, part.y, size, size);
+  });
+
+  // 💖 แอปเปิ้ลสีชมพู
+  ctx.fillStyle = "#ff4d88";
+  ctx.fillRect(apple.x, apple.y, size, size);
+
+  let head = {...snake[0]};
+
+  if(direction === "up") head.y -= size;
+  if(direction === "down") head.y += size;
+  if(direction === "left") head.x -= size;
+  if(direction === "right") head.x += size;
+
+  // 💀 ชนตัวเอง
+  for(let part of snake) {
+    if(head.x === part.x && head.y === part.y) {
+      gameOver();
+    }
+  }
+
+  snake.unshift(head);
+
+  // 🍎 กิน
+  if(head.x === apple.x && head.y === apple.y) {
+    score++;
+    document.getElementById("score").innerText = "คะแนน: " + score;
+    spawnApple();
+  } else {
+    snake.pop();
+  }
+
+  // 💔 ชนขอบ
+  if(head.x < 0 || head.y < 0 || head.x >= 300 || head.y >= 300) {
+    gameOver();
+  }
+}
+
+function gameOver() {
+  alert("💔 แพ้แล้ววว! คะแนน: " + score);
+  snake = [{x:150, y:150}];
+  direction = "right";
+  score = 0;
+  document.getElementById("score").innerText = "คะแนน: 0";
+  spawnApple();
+}
+
+spawnApple();
+setInterval(draw, 100);
+</script>
+
+</body>
+</html>
